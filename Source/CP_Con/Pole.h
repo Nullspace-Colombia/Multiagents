@@ -57,18 +57,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TArray<uint8> ReceivedData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float data=0;
 
+
+		
 
 	uint8* DataRecv = new uint8[32];
-
+	TArray<float> DataSnd;
+	float* DataSend;
+	uint8* DataSendPtr;
 	uint32 buffsize = 0;
 	int32 bytesread = 0;
-	float data;
+
 	float* data_ptr;
 	void Open_Connection();
 	void Close_Connection();
 	void Conduct_Connection();
-	void ParseData(uint8* msg);
+	void ParseData(uint8* msg, uint32 size);
 
 	//UFUNCTION(BlueprintCallable)
 		//TArray<uint8> get_Data();

@@ -8,9 +8,9 @@ APole::APole()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	//otComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
+	Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Cam->SetupAttachment(RootComponent);
 	
 	//
@@ -65,15 +65,53 @@ void APole::Conduct_Connection() {
 				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
 				while (IsConnectionOpen) {
 					uint32 size;
+					int32 BytesSent = 0;
 
 					if (ConnectionSocket->HasPendingData(size)) {
 						//TArray<uint8> ReceivedData;
-						ReceivedData.Init(0, 10);
-						if (ConnectionSocket->Recv(DataRecv, size, bytesread)) {
-							ParseData(DataRecv);
+						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
+						UE_LOG(LogTemp, Warning, TEXT("Size of Data Pending:  %d"), size);
+						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
 
+						//ReceivedData.Init(0, 10);
+						if (ConnectionSocket->Recv(DataRecv, size, bytesread)) {
+							UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
+							UE_LOG(LogTemp, Warning, TEXT("Bytes Received:  %d"), bytesread);
+							UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
+							ParseData(DataRecv, bytesread);
 						}
+						FVector currLocation = Base->GetComponentLocation();
+						//DataSend = (uint8*)&currLocation.Y;
+						//ConnectionSocket->Send(DataSend, size, BytesSent);
+						DataSnd.Add(currLocation.X);
+						DataSnd.Add(currLocation.Y);
+						DataSnd.Add(currLocation.Z);
+						DataSnd.Add(currLocation.X);
+						
+					
+						DataSend = DataSnd.GetData();
+						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
+						DataSend = DataSnd.GetData()+1;
+						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
+						DataSend = DataSnd.GetData()+2;
+						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
+						DataSend = DataSnd.GetData()+3;
+						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
+
+						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
+						UE_LOG(LogTemp, Warning, TEXT("Buffer Size:  %d"), BytesSent);
+						UE_LOG(LogTemp, Warning, TEXT("Size of the data to send:  %d"), DataSnd.Num());
+
+						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
+						UE_LOG(LogTemp, Warning, TEXT("Posición en X:  %f"), currLocation.X);
+						UE_LOG(LogTemp, Warning, TEXT("Posición en Y:  %f"), currLocation.Y);
+						UE_LOG(LogTemp, Warning, TEXT("Posición en Z:  %f"), currLocation.Z);
+						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
+						DataSnd.Reset();
+					
+
 					}
+
 				}
 				});
 		}
@@ -125,12 +163,20 @@ void APole::ParseData(uint8* msg) {
 }*/
 
 // buffsize 
-void APole::ParseData(uint8* msg) {
+void APole::ParseData(uint8* msg, uint32 size) {
 	data_ptr = reinterpret_cast<float*>(msg);
 	int buff_size = (int)*data_ptr;
+	
 
-	for (int idx = 1; idx < buff_size + 1; idx++) {
-		UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + idx));
+	for (int idx = 1; idx < (int)buff_size + 1; idx++) {
+		data = *(data_ptr + idx);
+		UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), data);
+		
 	}
 
+
 }
+/*
+void APole::SendData(TArray<float> msg) {
+
+}*/
