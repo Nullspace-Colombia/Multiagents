@@ -65,7 +65,9 @@ public:
 
 	uint8* DataRecv = new uint8[32];
 	TArray<float> DataSnd;
+	TArray<uint8> DataToSend;
 	float* DataSend;
+
 	uint8* DataSendPtr;
 	uint32 buffsize = 0;
 	int32 bytesread = 0;
@@ -75,6 +77,7 @@ public:
 	void Close_Connection();
 	void Conduct_Connection();
 	void ParseData(uint8* msg, uint32 size);
+	void SendData(TArray<uint8> msg);
 
 	//UFUNCTION(BlueprintCallable)
 		//TArray<uint8> get_Data();

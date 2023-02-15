@@ -65,48 +65,37 @@ void APole::Conduct_Connection() {
 				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
 				while (IsConnectionOpen) {
 					uint32 size;
-					int32 BytesSent = 0;
+					//int32 BytesSent = 0;
 
 					if (ConnectionSocket->HasPendingData(size)) {
 						//TArray<uint8> ReceivedData;
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-						UE_LOG(LogTemp, Warning, TEXT("Size of Data Pending:  %d"), size);
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
+						
+						UE_LOG(LogTemp, Warning, TEXT("Size of the data pending:  %d"), size);
+					
 
-						//ReceivedData.Init(0, 10);
 						if (ConnectionSocket->Recv(DataRecv, size, bytesread)) {
-							UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-							UE_LOG(LogTemp, Warning, TEXT("Bytes Received:  %d"), bytesread);
-							UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
 							ParseData(DataRecv, bytesread);
 						}
 						FVector currLocation = Base->GetComponentLocation();
-						//DataSend = (uint8*)&currLocation.Y;
-						//ConnectionSocket->Send(DataSend, size, BytesSent);
 						DataSnd.Add(currLocation.X);
 						DataSnd.Add(currLocation.Y);
 						DataSnd.Add(currLocation.Z);
 						DataSnd.Add(currLocation.X);
+
+						DataToSend.Add(currLocation.X);
+						DataToSend.Add(currLocation.Y);
+						DataToSend.Add(currLocation.Z);
+						DataToSend.Add(currLocation.X);
 						
-					
-						DataSend = DataSnd.GetData();
-						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
-						DataSend = DataSnd.GetData()+1;
-						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
-						DataSend = DataSnd.GetData()+2;
-						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
-						DataSend = DataSnd.GetData()+3;
-						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
-
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-						UE_LOG(LogTemp, Warning, TEXT("Buffer Size:  %d"), BytesSent);
+						SendData(DataToSend);
+						/*
 						UE_LOG(LogTemp, Warning, TEXT("Size of the data to send:  %d"), DataSnd.Num());
-
 						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
 						UE_LOG(LogTemp, Warning, TEXT("Posición en X:  %f"), currLocation.X);
 						UE_LOG(LogTemp, Warning, TEXT("Posición en Y:  %f"), currLocation.Y);
 						UE_LOG(LogTemp, Warning, TEXT("Posición en Z:  %f"), currLocation.Z);
 						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
+						*/
 						DataSnd.Reset();
 					
 
@@ -153,16 +142,6 @@ void APole::Close_Connection() {
 	}
 }
 
-/*
-void APole::ParseData(uint8* msg) {
-	data_ptr = reinterpret_cast<float*>(msg);
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 1));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 2));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 3));
-}*/
-
-// buffsize 
 void APole::ParseData(uint8* msg, uint32 size) {
 	data_ptr = reinterpret_cast<float*>(msg);
 	int buff_size = (int)*data_ptr;
@@ -173,10 +152,14 @@ void APole::ParseData(uint8* msg, uint32 size) {
 		UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), data);
 		
 	}
-
-
 }
-/*
-void APole::SendData(TArray<float> msg) {
 
-}*/
+
+void APole::SendData(TArray<uint8> msg) {
+	int32 BytesSent = 0;
+	uint8* DataS;
+	for (int idx = 0; idx < msg.Num(); idx++) {
+		DataS = msg.GetData() + idx;
+		ConnectionSocket->Send(DataS, msg.Num(), BytesSent);
+	}
+}
