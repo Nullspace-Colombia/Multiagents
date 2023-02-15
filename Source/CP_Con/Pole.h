@@ -78,7 +78,8 @@ public:
 	void Conduct_Connection();
 	void ParseData(uint8* msg, uint32 size);
 	void SendData(TArray<uint8> msg);
-
+	void SendFloat(TArray<float> msg);
+	
 	//UFUNCTION(BlueprintCallable)
 		//TArray<uint8> get_Data();
 

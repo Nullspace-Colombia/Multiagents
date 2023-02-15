@@ -163,3 +163,13 @@ void APole::SendData(TArray<uint8> msg) {
 		ConnectionSocket->Send(DataS, msg.Num(), BytesSent);
 	}
 }
+
+void APole::SendFloat(TArray<float> msg) {
+	int32 BytesSent = 0;
+	float* DataS;
+	for (int idx = 0; idx < msg.Num(); idx++) {
+		DataS = msg.GetData() + idx;
+		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), msg.Num(), BytesSent);
+	}
+
+}
