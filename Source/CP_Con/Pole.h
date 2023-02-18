@@ -13,6 +13,11 @@
 #include "Camera/CameraComponent.h"
 #include "Pole.generated.h"
 
+//Declaring the delegates signature
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReceptionSignature, TArray<uint8>, DataR);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReception, float, DataR);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReceptionPtr, TArray<uint8>*, DataRecv);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLenArray, const TArray<uint8>&, Arr);
 
 UCLASS()
 class CP_CON_API APole : public APawn
@@ -54,14 +59,14 @@ public:
 	UPROPERTY(EditAnywhere)
 		AWorldSettings* WorldSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 		TArray<uint8> ReceivedData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float data=0;
+		float data = 0;
 
 
-		
+
 
 	uint8* DataRecv = new uint8[32];
 	TArray<float> DataSnd;
@@ -75,11 +80,48 @@ public:
 	float* data_ptr;
 	void Open_Connection();
 	void Close_Connection();
-	void Conduct_Connection();
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void Conduct_Connection();
+
 	void ParseData(uint8* msg, uint32 size);
 	void SendData(TArray<uint8> msg);
-	void SendFloat(TArray<float> msg);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SendFloat"), Category = "Socket")
+		void SendFloat(TArray<float> msg);
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void StartServer(FString ipAddress, int32 port);
+
+	//Function called by the delegate
+	UFUNCTION(BlueprintCallable)
+		void OnReceivedData(TArray<uint8> DataR);
+
+	UFUNCTION(BlueprintCallable)
+		void OnRData(float DataR);
+
+	//UFUNCTION(BlueprintCallable)
+	//void OnReceivedDataPtr(TArray<uint8>* DataR);
+
+	//Creating the variables of delegate type (other functions can subscrite to this function)
+	UPROPERTY(BlueprintAssignable)
+	FOnDataReceptionSignature OnDataReceptionDelegate;
 	
+	UPROPERTY(BlueprintAssignable)
+	FOnDataReception OnDataReceiveDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnLenArray OnLenArrayDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	void PrintArrayLength(UPARAM(ref) TArray<uint8>& arreglo);
+
+	UFUNCTION(BlueprintCallable)
+	void RecibirEntero(int32 entero);
+	//UPROPERTY(BlueprintAssignable)
+	//FOnDataReceptionPtr OnDataReceiveDelegatePtr;
+
+	void ReturnReceivedData(TArray<uint8> msg);
 	//UFUNCTION(BlueprintCallable)
 		//TArray<uint8> get_Data();
 

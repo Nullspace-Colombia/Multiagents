@@ -20,7 +20,7 @@ APole::APole()
 void APole::BeginPlay()
 {
 	Super::BeginPlay();
-	Open_Connection();
+	//Open_Connection();
 
 }
 
@@ -39,7 +39,7 @@ void APole::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-	Conduct_Connection();
+	//Conduct_Connection();
 
 }
 
@@ -70,11 +70,14 @@ void APole::Conduct_Connection() {
 					if (ConnectionSocket->HasPendingData(size)) {
 						//TArray<uint8> ReceivedData;
 						
-						UE_LOG(LogTemp, Warning, TEXT("Size of the data pending:  %d"), size);
+						//UE_LOG(LogTemp, Warning, TEXT("Size of the data pending:  %d"), size);
 					
 
-						if (ConnectionSocket->Recv(DataRecv, size, bytesread)) {
+						if (ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread)) {
 							ParseData(DataRecv, bytesread);
+							OnLenArrayDelegate.Broadcast(ReceivedData);
+							//OnReceivedData(ReceivedData);
+							//OnReceivedDataPtr(ReceivedData.GetData());
 						}
 						FVector currLocation = Base->GetComponentLocation();
 						DataSnd.Add(currLocation.X);
@@ -88,23 +91,42 @@ void APole::Conduct_Connection() {
 						DataToSend.Add(currLocation.X);
 						
 						SendData(DataToSend);
-						/*
-						UE_LOG(LogTemp, Warning, TEXT("Size of the data to send:  %d"), DataSnd.Num());
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-						UE_LOG(LogTemp, Warning, TEXT("Posición en X:  %f"), currLocation.X);
-						UE_LOG(LogTemp, Warning, TEXT("Posición en Y:  %f"), currLocation.Y);
-						UE_LOG(LogTemp, Warning, TEXT("Posición en Z:  %f"), currLocation.Z);
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-						*/
-						DataSnd.Reset();
+						DataToSend.Reset();
 					
 
 					}
 
 				}
 				});
+			//UE_LOG(LogTemp, Warning, TEXT("After thread execution"));
 		}
 	}
+}
+
+void APole::OnReceivedData(TArray<uint8> DataR) {
+	if (DataR.IsEmpty()) {
+		DataR.Add(1);
+	}
+	OnDataReceptionDelegate.Broadcast(DataR);
+}
+
+void APole::OnRData(float DataR) {
+	OnDataReceiveDelegate.Broadcast(DataR);
+}
+
+/*
+void APole::OnReceivedDataPtr(TArray<uint8>* DataR) {
+	OnDataReceptionDelegate.Broadcast(DataR);
+}*/
+
+void APole::RecibirEntero(int32 entero) {
+
+}
+void APole::PrintArrayLength(UPARAM(ref) TArray<uint8>& arreglo) {
+	//UE_LOG(LogTemp, Warning, TEXT("Length, %d"), arreglo.Num());
+	//arreglo.Init(5, 5);
+	OnLenArrayDelegate.Broadcast(arreglo);
+	//return arreglo.Num();
 }
 
 void APole::Reset_Env() {
@@ -112,6 +134,25 @@ void APole::Reset_Env() {
 	FVector currLocation = Base->GetComponentLocation();
 	currLocation.X = 0;
 	Base->SetWorldLocation(currLocation);
+}
+
+void APole::StartServer(FString ipAddress, int32 port){
+	if (!IsConnectionOpen) {
+		UE_LOG(LogTemp, Warning, TEXT("Openning Connection"));
+		IsConnectionOpen = true;
+		WaitingForConnection = true;
+
+		FIPv4Address IPAddress;
+		FIPv4Address::Parse(ipAddress, IPAddress);
+		FIPv4Endpoint Endpoint(IPAddress, (uint16)port);
+
+		ListenSocket = FTcpSocketBuilder(TEXT("TcpSocket")).AsReusable();
+
+		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+		ListenSocket->Bind(*SocketSubsystem->CreateInternetAddr(Endpoint.Address.Value, Endpoint.Port));
+		ListenSocket->Listen(1);
+		UE_LOG(LogTemp, Warning, TEXT("Listening"));
+	}
 }
 
 void APole::Open_Connection() {
@@ -150,8 +191,9 @@ void APole::ParseData(uint8* msg, uint32 size) {
 	for (int idx = 1; idx < (int)buff_size + 1; idx++) {
 		data = *(data_ptr + idx);
 		UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), data);
-		
+		OnRData(data);
 	}
+	
 }
 
 
@@ -173,5 +215,7 @@ void APole::SendFloat(TArray<float> msg) {
 	}
 
 }
+
+
 
 
