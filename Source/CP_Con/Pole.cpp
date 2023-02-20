@@ -10,8 +10,8 @@ APole::APole()
 
 	//otComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
-	Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Cam->SetupAttachment(RootComponent);
+	//Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	//Cam->SetupAttachment(RootComponent);
 	
 	//
 }
@@ -67,19 +67,19 @@ void APole::Conduct_Connection() {
 				while (IsConnectionOpen) {
 					uint32 size;
 					//int32 BytesSent = 0;
-
+					
 					if (ConnectionSocket->HasPendingData(size)) {
 						//TArray<uint8> ReceivedData;
-						
-						//UE_LOG(LogTemp, Warning, TEXT("Size of the data pending:  %d"), size);
-					
 
-						if (ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread)) {
-							ParseData(DataRecv, bytesread);
-							OnDataReceptionDelegate.Broadcast(ReceivedData);
+
+
+						ReceivedData.Init(0, 64);
+						ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread);
+							//ParseData(DataRecv, bytesread);
+						OnDataReceptionDelegate.Broadcast(ReceivedData);
 							//OnReceivedData(ReceivedData);
 							//OnReceivedDataPtr(ReceivedData.GetData());
-						}
+						
 						FVector currLocation = Base->GetComponentLocation();
 						DataSnd.Add(currLocation.X);
 						DataSnd.Add(currLocation.Y);
@@ -93,7 +93,7 @@ void APole::Conduct_Connection() {
 						
 						SendData(DataToSend);
 						DataToSend.Reset();
-					
+						
 
 					}
 
@@ -127,8 +127,8 @@ void APole::RecibirEntero(int32 entero) {
 
 }*/
 
-void APole::GetReceivedData(UPARAM(ref) TArray<uint8>& arreglo) {
-	OnDataReceptionDelegate.Broadcast(arreglo);
+void APole::GetReceivedData() {
+	OnDataReceptionDelegate.Broadcast(ReceivedData);
 }
 
 void APole::Reset_Env() {
@@ -185,17 +185,19 @@ void APole::Close_Connection() {
 	}
 }
 
-void APole::ParseData(uint8* msg, uint32 size) {
-	data_ptr = reinterpret_cast<float*>(msg);
+TArray<float> APole::ParseData(TArray<uint8> msg) {
+	TArray<float> data_rcv;
+	data_ptr = reinterpret_cast<float*>(msg.GetData());
+
 	int buff_size = (int)*data_ptr;
-	
+	UE_LOG(LogTemp, Warning, TEXT("Buffer Size: %d"), buff_size);
 
 	for (int idx = 1; idx < (int)buff_size + 1; idx++) {
 		data = *(data_ptr + idx);
-		UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), data);
-		//OnRData(data);
+		data_rcv.Add(data);
 	}
-	
+	UE_LOG(LogTemp, Warning, TEXT("Array size: %d"), data_rcv.Num());
+	return data_rcv;
 }
 
 

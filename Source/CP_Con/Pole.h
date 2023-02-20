@@ -50,8 +50,8 @@ public:
 	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* Base;
 
-	UPROPERTY(EditAnywhere)
-		USceneComponent* Cam;
+	//UPROPERTY(EditAnywhere)
+		//USceneComponent* Cam;
 
 	UPROPERTY(EditAnywhere)
 		USceneComponent* _BaseComponent;
@@ -59,7 +59,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		AWorldSettings* WorldSettings;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly)
 		TArray<uint8> ReceivedData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -84,7 +84,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void Conduct_Connection();
 
-	void ParseData(uint8* msg, uint32 size);
+	UFUNCTION(BlueprintCallable, Category = "Data")
+		TArray<float>  ParseData(TArray<uint8> msg);
 	void SendData(TArray<uint8> msg);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SendFloat"), Category = "Socket")
@@ -111,7 +112,7 @@ public:
 	//FOnLenArray OnLenArrayDelegate;
 
 	UFUNCTION(BlueprintCallable)
-	void GetReceivedData(UPARAM(ref) TArray<uint8>& arreglo);
+	void GetReceivedData();
 
 	//UFUNCTION(BlueprintCallable)
 	//void RecibirEntero(int32 entero);
