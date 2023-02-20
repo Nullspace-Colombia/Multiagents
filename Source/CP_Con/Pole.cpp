@@ -63,6 +63,7 @@ void APole::Conduct_Connection() {
 			// Start Recv Thread
 			ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
 				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
+
 				while (IsConnectionOpen) {
 					uint32 size;
 					//int32 BytesSent = 0;
@@ -75,7 +76,7 @@ void APole::Conduct_Connection() {
 
 						if (ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread)) {
 							ParseData(DataRecv, bytesread);
-							OnLenArrayDelegate.Broadcast(ReceivedData);
+							OnDataReceptionDelegate.Broadcast(ReceivedData);
 							//OnReceivedData(ReceivedData);
 							//OnReceivedDataPtr(ReceivedData.GetData());
 						}
@@ -103,30 +104,31 @@ void APole::Conduct_Connection() {
 	}
 }
 
+/*
 void APole::OnReceivedData(TArray<uint8> DataR) {
 	if (DataR.IsEmpty()) {
 		DataR.Add(1);
 	}
 	OnDataReceptionDelegate.Broadcast(DataR);
-}
+}*/
 
+/*
 void APole::OnRData(float DataR) {
 	OnDataReceiveDelegate.Broadcast(DataR);
-}
+}*/
 
 /*
 void APole::OnReceivedDataPtr(TArray<uint8>* DataR) {
 	OnDataReceptionDelegate.Broadcast(DataR);
 }*/
 
+/*
 void APole::RecibirEntero(int32 entero) {
 
-}
-void APole::PrintArrayLength(UPARAM(ref) TArray<uint8>& arreglo) {
-	//UE_LOG(LogTemp, Warning, TEXT("Length, %d"), arreglo.Num());
-	//arreglo.Init(5, 5);
-	OnLenArrayDelegate.Broadcast(arreglo);
-	//return arreglo.Num();
+}*/
+
+void APole::GetReceivedData(UPARAM(ref) TArray<uint8>& arreglo) {
+	OnDataReceptionDelegate.Broadcast(arreglo);
 }
 
 void APole::Reset_Env() {
@@ -191,7 +193,7 @@ void APole::ParseData(uint8* msg, uint32 size) {
 	for (int idx = 1; idx < (int)buff_size + 1; idx++) {
 		data = *(data_ptr + idx);
 		UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), data);
-		OnRData(data);
+		//OnRData(data);
 	}
 	
 }

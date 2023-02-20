@@ -14,10 +14,10 @@
 #include "Pole.generated.h"
 
 //Declaring the delegates signature
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReceptionSignature, TArray<uint8>, DataR);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReception, float, DataR);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReceptionSignature, TArray<uint8>, DataR);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReception, float, DataR);
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReceptionPtr, TArray<uint8>*, DataRecv);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLenArray, const TArray<uint8>&, Arr);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReception, const TArray<uint8>&, Arr);
 
 UCLASS()
 class CP_CON_API APole : public APawn
@@ -93,35 +93,32 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void StartServer(FString ipAddress, int32 port);
 
-	//Function called by the delegate
-	UFUNCTION(BlueprintCallable)
-		void OnReceivedData(TArray<uint8> DataR);
 
-	UFUNCTION(BlueprintCallable)
-		void OnRData(float DataR);
+	//UFUNCTION(BlueprintCallable)
+		//void OnRData(float DataR);
 
 	//UFUNCTION(BlueprintCallable)
 	//void OnReceivedDataPtr(TArray<uint8>* DataR);
 
 	//Creating the variables of delegate type (other functions can subscrite to this function)
-	UPROPERTY(BlueprintAssignable)
-	FOnDataReceptionSignature OnDataReceptionDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	//FOnDataReceptionSignature OnDataReceptionDelegate;
 	
 	UPROPERTY(BlueprintAssignable)
-	FOnDataReception OnDataReceiveDelegate;
+	FOnDataReception OnDataReceptionDelegate;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnLenArray OnLenArrayDelegate;
-
-	UFUNCTION(BlueprintCallable)
-	void PrintArrayLength(UPARAM(ref) TArray<uint8>& arreglo);
+	//UPROPERTY(BlueprintAssignable)
+	//FOnLenArray OnLenArrayDelegate;
 
 	UFUNCTION(BlueprintCallable)
-	void RecibirEntero(int32 entero);
+	void GetReceivedData(UPARAM(ref) TArray<uint8>& arreglo);
+
+	//UFUNCTION(BlueprintCallable)
+	//void RecibirEntero(int32 entero);
 	//UPROPERTY(BlueprintAssignable)
 	//FOnDataReceptionPtr OnDataReceiveDelegatePtr;
 
-	void ReturnReceivedData(TArray<uint8> msg);
+	//void ReturnReceivedData(TArray<uint8> msg);
 	//UFUNCTION(BlueprintCallable)
 		//TArray<uint8> get_Data();
 
