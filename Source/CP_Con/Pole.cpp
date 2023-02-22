@@ -100,6 +100,7 @@ void APole::Conduct_Connection() {
 				}
 				});
 			//UE_LOG(LogTemp, Warning, TEXT("After thread execution"));
+			
 		}
 	}
 }
