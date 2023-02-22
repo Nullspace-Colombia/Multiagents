@@ -9,7 +9,7 @@ APole::APole()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//otComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
+	//Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
 	//Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	//Cam->SetupAttachment(RootComponent);
 	
@@ -80,6 +80,7 @@ void APole::Conduct_Connection() {
 							//OnReceivedData(ReceivedData);
 							//OnReceivedDataPtr(ReceivedData.GetData());
 						
+						/*
 						FVector currLocation = Base->GetComponentLocation();
 						DataSnd.Add(currLocation.X);
 						DataSnd.Add(currLocation.Y);
@@ -93,7 +94,7 @@ void APole::Conduct_Connection() {
 						
 						SendData(DataToSend);
 						DataToSend.Reset();
-						
+						*/
 
 					}
 
@@ -134,9 +135,9 @@ void APole::GetReceivedData() {
 
 void APole::Reset_Env() {
 	UE_LOG(LogTemp, Warning, TEXT("Environment Reset"));
-	FVector currLocation = Base->GetComponentLocation();
-	currLocation.X = 0;
-	Base->SetWorldLocation(currLocation);
+	//FVector currLocation = Base->GetComponentLocation();
+	//currLocation.X = 0;
+	//Base->SetWorldLocation(currLocation);
 }
 
 void APole::StartServer(FString ipAddress, int32 port){

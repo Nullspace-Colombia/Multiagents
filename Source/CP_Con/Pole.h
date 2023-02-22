@@ -47,14 +47,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere)
-		UStaticMeshComponent* Base;
+	//UPROPERTY(EditAnywhere)
+		//UStaticMeshComponent* Base;
 
 	//UPROPERTY(EditAnywhere)
 		//USceneComponent* Cam;
 
-	UPROPERTY(EditAnywhere)
-		USceneComponent* _BaseComponent;
+	//UPROPERTY(EditAnywhere)
+		//USceneComponent* _BaseComponent;
 
 	UPROPERTY(EditAnywhere)
 		AWorldSettings* WorldSettings;
