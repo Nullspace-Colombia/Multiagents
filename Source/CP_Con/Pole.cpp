@@ -189,10 +189,10 @@ TArray<float> APole::ParseData(TArray<uint8> msg) {
 	TArray<float> data_rcv;
 	data_ptr = reinterpret_cast<float*>(msg.GetData());
 
-	int buff_size = (int)*data_ptr;
-	UE_LOG(LogTemp, Warning, TEXT("Buffer Size: %d"), buff_size);
+	int buff_size = bytesread / 4;
+	UE_LOG(LogTemp, Warning, TEXT("Buffer Size: %d"), bytesread);
 
-	for (int idx = 1; idx < (int)buff_size + 1; idx++) {
+	for (int idx = 0; idx < (int)buff_size; idx++) {
 		data = *(data_ptr + idx);
 		data_rcv.Add(data);
 	}
