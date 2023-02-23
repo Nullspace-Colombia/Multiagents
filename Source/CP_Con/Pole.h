@@ -84,8 +84,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void Conduct_Connection();
 
-	UFUNCTION(BlueprintCallable, Category = "Data")
+	UFUNCTION(BlueprintCallable, Category = "Socket")
 		TArray<float>  ParseData(TArray<uint8> msg);
+
 	void SendData(TArray<uint8> msg);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SendFloat"), Category = "Socket")
