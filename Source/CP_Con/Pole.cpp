@@ -63,9 +63,17 @@ void APole::Conduct_Connection() {
 			// Start Recv Thread
 			ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
 				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
+				//Sending a confirmation array:
+				//TArray<uint8> Confirmation;
+				//Confirmation.Add(0);
+				//Confirmation.Add(1);
+				//Confirmation.Add(2);
+				//Confirmation.Add(3);
+				//SendData(Confirmation);
 
 				while (IsConnectionOpen) {
 					uint32 size;
+					TArray<uint8> ReceivedData;
 					//int32 BytesSent = 0;
 					
 					if (ConnectionSocket->HasPendingData(size)) {
@@ -95,9 +103,9 @@ void APole::Conduct_Connection() {
 						SendData(DataToSend);
 						DataToSend.Reset();
 						*/
-
+						ReceivedData.Reset();
 					}
-
+					
 				}
 				});
 			//UE_LOG(LogTemp, Warning, TEXT("After thread execution"));
@@ -130,7 +138,7 @@ void APole::RecibirEntero(int32 entero) {
 }*/
 
 void APole::GetReceivedData() {
-	OnDataReceptionDelegate.Broadcast(ReceivedData);
+	//DataReceptionDelegate.Broadcast(ReceivedData);
 }
 
 void APole::Reset_Env() {
@@ -213,13 +221,32 @@ void APole::SendData(TArray<uint8> msg) {
 }
 
 void APole::SendFloat(TArray<float> msg) {
-	int32 BytesSent = 0;
+	
 	float* DataS;
 	for (int idx = 0; idx < msg.Num(); idx++) {
+		int32 BytesSent = 0;
 		DataS = msg.GetData() + idx;
 		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), msg.Num(), BytesSent);
+		/*
+		UE_LOG(LogTemp, Warning, TEXT("Data Sent: %f"), *DataS);
+		UE_LOG(LogTemp, Warning, TEXT("Bytes Sent: %d"), BytesSent);
+		UE_LOG(LogTemp, Warning, TEXT("Bytes Sent: %d"), msg.Num());
+		*/
 	}
+	
 
+}
+
+bool APole::CheckDone(float done) {
+	bool is_done;
+	
+	if (done == 1.0){
+		is_done = true;
+	}
+	else if (done == 0.0){
+		is_done = false;
+	}
+	return is_done;
 }
 
 
