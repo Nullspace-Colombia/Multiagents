@@ -98,8 +98,8 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SendFloat"), Category = "Socket")
 		void SendFloat(TArray<float> msg);
 
-	UFUNCTION(BlueprintCallable, Category = "Training")
-		bool CheckDone(float done);
+	//UFUNCTION(BlueprintCallable, Category = "Training")
+		//bool CheckDone(float done);
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void StartServer(FString ipAddress, int32 port);
 

@@ -223,30 +223,17 @@ void APole::SendData(TArray<uint8> msg) {
 void APole::SendFloat(TArray<float> msg) {
 	
 	float* DataS;
+	int32 BytesSent = 0;
+
 	for (int idx = 0; idx < msg.Num(); idx++) {
-		int32 BytesSent = 0;
+		
 		DataS = msg.GetData() + idx;
 		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), msg.Num(), BytesSent);
-		/*
-		UE_LOG(LogTemp, Warning, TEXT("Data Sent: %f"), *DataS);
-		UE_LOG(LogTemp, Warning, TEXT("Bytes Sent: %d"), BytesSent);
-		UE_LOG(LogTemp, Warning, TEXT("Bytes Sent: %d"), msg.Num());
-		*/
+		//UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
+		//UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
 	}
 	
 
-}
-
-bool APole::CheckDone(float done) {
-	bool is_done;
-	
-	if (done == 1.0){
-		is_done = true;
-	}
-	else if (done == 0.0){
-		is_done = false;
-	}
-	return is_done;
 }
 
 
