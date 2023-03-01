@@ -32,7 +32,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	bool IsConnectionOpen = false;
+	UPROPERTY(BlueprintReadOnly)
+		bool IsConnectionOpen = false;
+	
+	UPROPERTY(BlueprintReadOnly)
+		bool connected = false;
+
 	bool WaitingForConnection = false;
 
 	bool HasInput = false;

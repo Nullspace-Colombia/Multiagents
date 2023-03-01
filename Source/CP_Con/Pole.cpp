@@ -59,7 +59,7 @@ void APole::Conduct_Connection() {
 			ConnectionSocket = ListenSocket->Accept(*RemoteAddress, TEXT("Connection"));
 			WaitingForConnection = false;
 			UE_LOG(LogTemp, Warning, TEXT("incoming connection"));
-
+			connected = true;
 			// Start Recv Thread
 			ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
 				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
