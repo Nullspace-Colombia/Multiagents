@@ -224,7 +224,7 @@ void APole::SendFloat(TArray<float> msg) {
 	
 	float* DataS;
 	int32 BytesSent = 0;
-
+	
 	for (int idx = 0; idx < msg.Num(); idx++) {
 		
 		DataS = msg.GetData() + idx;
@@ -232,8 +232,18 @@ void APole::SendFloat(TArray<float> msg) {
 		//UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
 		//UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
 	}
-	
+	/*
+	// convert the array to a byte array
+	TArray<uint8> ByteArray;
+	ByteArray.Append((uint8*)msg.GetData(), msg.Num() * sizeof(float));
 
+	// send the byte array over the socket
+	FString DataString = FString::FromBlob(ByteArray.GetData(), ByteArray.Num());
+	int32 BytesSent = 0;
+	ConnectionSocket->Send((const uint8*)TCHAR_TO_UTF8(*DataString), DataString.Len(), BytesSent);
+	UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataString);
+	UE_LOG(LogTemp, Warning, TEXT("BytesSent: %f"), BytesSent);
+	*/
 }
 
 
