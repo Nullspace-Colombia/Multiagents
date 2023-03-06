@@ -8,10 +8,10 @@ APole::APole()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
-	Cam->SetupAttachment(RootComponent);
+	//otComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	//Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
+	//Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	//Cam->SetupAttachment(RootComponent);
 	
 	//
 }
@@ -20,7 +20,7 @@ APole::APole()
 void APole::BeginPlay()
 {
 	Super::BeginPlay();
-	Open_Connection();
+	//Open_Connection();
 
 }
 
@@ -39,7 +39,7 @@ void APole::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-	Conduct_Connection();
+	//Conduct_Connection();
 
 }
 
@@ -59,32 +59,112 @@ void APole::Conduct_Connection() {
 			ConnectionSocket = ListenSocket->Accept(*RemoteAddress, TEXT("Connection"));
 			WaitingForConnection = false;
 			UE_LOG(LogTemp, Warning, TEXT("incoming connection"));
-
+			connected = true;
 			// Start Recv Thread
 			ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
 				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
+				//Sending a confirmation array:
+				//TArray<uint8> Confirmation;
+				//Confirmation.Add(0);
+				//Confirmation.Add(1);
+				//Confirmation.Add(2);
+				//Confirmation.Add(3);
+				//SendData(Confirmation);
+
 				while (IsConnectionOpen) {
 					uint32 size;
-
+					TArray<uint8> ReceivedData;
+					//int32 BytesSent = 0;
+					
 					if (ConnectionSocket->HasPendingData(size)) {
 						//TArray<uint8> ReceivedData;
-						ReceivedData.Init(0, 10);
-						if (ConnectionSocket->Recv(DataRecv, size, bytesread)) {
-							ParseData(DataRecv);
 
-						}
+
+
+						ReceivedData.Init(0, 64);
+						ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread);
+							//ParseData(DataRecv, bytesread);
+						OnDataReceptionDelegate.Broadcast(ReceivedData);
+							//OnReceivedData(ReceivedData);
+							//OnReceivedDataPtr(ReceivedData.GetData());
+						
+						/*
+						FVector currLocation = Base->GetComponentLocation();
+						DataSnd.Add(currLocation.X);
+						DataSnd.Add(currLocation.Y);
+						DataSnd.Add(currLocation.Z);
+						DataSnd.Add(currLocation.X);
+
+						DataToSend.Add(currLocation.X);
+						DataToSend.Add(currLocation.Y);
+						DataToSend.Add(currLocation.Z);
+						DataToSend.Add(currLocation.X);
+						
+						SendData(DataToSend);
+						DataToSend.Reset();
+						*/
+						ReceivedData.Reset();
 					}
+					
 				}
 				});
+			//UE_LOG(LogTemp, Warning, TEXT("After thread execution"));
+			
 		}
 	}
 }
 
+/*
+void APole::OnReceivedData(TArray<uint8> DataR) {
+	if (DataR.IsEmpty()) {
+		DataR.Add(1);
+	}
+	OnDataReceptionDelegate.Broadcast(DataR);
+}*/
+
+/*
+void APole::OnRData(float DataR) {
+	OnDataReceiveDelegate.Broadcast(DataR);
+}*/
+
+/*
+void APole::OnReceivedDataPtr(TArray<uint8>* DataR) {
+	OnDataReceptionDelegate.Broadcast(DataR);
+}*/
+
+/*
+void APole::RecibirEntero(int32 entero) {
+
+}*/
+
+void APole::GetReceivedData() {
+	//DataReceptionDelegate.Broadcast(ReceivedData);
+}
+
 void APole::Reset_Env() {
 	UE_LOG(LogTemp, Warning, TEXT("Environment Reset"));
-	FVector currLocation = Base->GetComponentLocation();
-	currLocation.X = 0;
-	Base->SetWorldLocation(currLocation);
+	//FVector currLocation = Base->GetComponentLocation();
+	//currLocation.X = 0;
+	//Base->SetWorldLocation(currLocation);
+}
+
+void APole::StartServer(FString ipAddress, int32 port){
+	if (!IsConnectionOpen) {
+		UE_LOG(LogTemp, Warning, TEXT("Openning Connection"));
+		IsConnectionOpen = true;
+		WaitingForConnection = true;
+
+		FIPv4Address IPAddress;
+		FIPv4Address::Parse(ipAddress, IPAddress);
+		FIPv4Endpoint Endpoint(IPAddress, (uint16)port);
+
+		ListenSocket = FTcpSocketBuilder(TEXT("TcpSocket")).AsReusable();
+
+		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+		ListenSocket->Bind(*SocketSubsystem->CreateInternetAddr(Endpoint.Address.Value, Endpoint.Port));
+		ListenSocket->Listen(1);
+		UE_LOG(LogTemp, Warning, TEXT("Listening"));
+	}
 }
 
 void APole::Open_Connection() {
@@ -115,22 +195,57 @@ void APole::Close_Connection() {
 	}
 }
 
-/*
-void APole::ParseData(uint8* msg) {
-	data_ptr = reinterpret_cast<float*>(msg);
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 1));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 2));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 3));
-}*/
+TArray<float> APole::ParseData(TArray<uint8> msg) {
+	TArray<float> data_rcv;
+	data_ptr = reinterpret_cast<float*>(msg.GetData());
 
-// buffsize 
-void APole::ParseData(uint8* msg) {
-	data_ptr = reinterpret_cast<float*>(msg);
-	int buff_size = (int)*data_ptr;
+	int buff_size = bytesread / 4;
+	UE_LOG(LogTemp, Warning, TEXT("Buffer Size: %d"), bytesread);
 
-	for (int idx = 1; idx < buff_size + 1; idx++) {
-		UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + idx));
+	for (int idx = 0; idx < (int)buff_size; idx++) {
+		data = *(data_ptr + idx);
+		data_rcv.Add(data);
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("Array size: %d"), data_rcv.Num());
+	return data_rcv;
 }
+
+
+void APole::SendData(TArray<uint8> msg) {
+	int32 BytesSent = 0;
+	uint8* DataS;
+	for (int idx = 0; idx < msg.Num(); idx++) {
+		DataS = msg.GetData() + idx;
+		ConnectionSocket->Send(DataS, msg.Num(), BytesSent);
+	}
+}
+
+void APole::SendFloat(TArray<float> msg) {
+	
+	float* DataS;
+	int32 BytesSent = 0;
+	
+	for (int idx = 0; idx < msg.Num(); idx++) {
+		
+		DataS = msg.GetData() + idx;
+		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), msg.Num(), BytesSent);
+		//UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
+		//UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
+	}
+	/*
+	// convert the array to a byte array
+	TArray<uint8> ByteArray;
+	ByteArray.Append((uint8*)msg.GetData(), msg.Num() * sizeof(float));
+
+	// send the byte array over the socket
+	FString DataString = FString::FromBlob(ByteArray.GetData(), ByteArray.Num());
+	int32 BytesSent = 0;
+	ConnectionSocket->Send((const uint8*)TCHAR_TO_UTF8(*DataString), DataString.Len(), BytesSent);
+	UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataString);
+	UE_LOG(LogTemp, Warning, TEXT("BytesSent: %f"), BytesSent);
+	*/
+}
+
+
+
+
