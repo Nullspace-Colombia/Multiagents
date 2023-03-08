@@ -95,8 +95,8 @@ public:
 
 	void SendData(TArray<uint8> msg);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SendFloat"), Category = "Socket")
-		void SendFloat(TArray<float> msg);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SendDouble"), Category = "Socket")
+		void SendDouble(TArray<double> msg);
 
 	//UFUNCTION(BlueprintCallable, Category = "Training")
 		//bool CheckDone(float done);

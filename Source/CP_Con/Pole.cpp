@@ -220,17 +220,17 @@ void APole::SendData(TArray<uint8> msg) {
 	}
 }
 
-void APole::SendFloat(TArray<float> msg) {
+void APole::SendDouble(TArray<double> msg) {
 	
-	float* DataS;
+	double* DataS;
 	int32 BytesSent = 0;
 
 	for (int idx = 0; idx < msg.Num(); idx++) {
 		
 		DataS = msg.GetData() + idx;
 		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), msg.Num(), BytesSent);
-		//UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
-		//UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
+		UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
+		UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
 	}
 	
 
