@@ -228,7 +228,7 @@ void APole::SendDouble(TArray<double> msg) {
 	for (int idx = 0; idx < msg.Num(); idx++) {
 		
 		DataS = msg.GetData() + idx;
-		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), msg.Num(), BytesSent);
+		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
 		UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
 		UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
 	}
