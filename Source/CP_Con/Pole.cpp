@@ -235,7 +235,7 @@ void APole::SendData(TArray<double> msg) {
 	
 
 }
-void APole::SendState(TArray<float> Observations, int32 Reward, bool Done) {
+void APole::SendState(TArray<float> Observations, float Reward, bool Done) {
 	TArray<double> state;
 	double obs_data;
 	for (int i = 0; i < Observations.Num(); i++) {

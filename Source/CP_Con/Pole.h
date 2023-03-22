@@ -96,7 +96,7 @@ public:
 		TArray<float>  GetAction(TArray<uint8> msg);
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
-		void SendState(TArray<float> Observations, int32 Reward, bool Done);
+		void SendState(TArray<float> Observations, float Reward, bool Done);
 
 
 	void SendData(TArray<double> msg);
