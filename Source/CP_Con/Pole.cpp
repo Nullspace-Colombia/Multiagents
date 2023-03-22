@@ -195,7 +195,13 @@ void APole::Close_Connection() {
 	}
 }
 
-TArray<float> APole::ParseData(TArray<uint8> msg) {
+TArray<float> APole::GetAction(TArray<uint8> msg) {
+	/*if (msg.Num() != n_actions) {
+		TArray<float> empty_actions;
+		UE_LOG(LogTemp, Error, TEXT("Number of Actions does not match expected size :("));
+		return empty_actions;
+	}*/
+
 	TArray<float> data_rcv;
 	data_ptr = reinterpret_cast<float*>(msg.GetData());
 
@@ -203,37 +209,51 @@ TArray<float> APole::ParseData(TArray<uint8> msg) {
 	UE_LOG(LogTemp, Warning, TEXT("Buffer Size: %d"), bytesread);
 
 	for (int idx = 0; idx < (int)buff_size; idx++) {
-		data = *(data_ptr + idx);
-		data_rcv.Add(data);
+			data = *(data_ptr + idx);
+			data_rcv.Add(data);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Array size: %d"), data_rcv.Num());
 	return data_rcv;
+
 }
 
-
-void APole::SendData(TArray<uint8> msg) {
-	int32 BytesSent = 0;
-	uint8* DataS;
-	for (int idx = 0; idx < msg.Num(); idx++) {
-		DataS = msg.GetData() + idx;
-		ConnectionSocket->Send(DataS, msg.Num(), BytesSent);
-	}
-}
-
-void APole::SendDouble(TArray<double> msg) {
+void APole::SendData(TArray<double> msg) {
 	
 	double* DataS;
 	int32 BytesSent = 0;
+	/*if (msg.Num() - 2 != n_obs) {
+		UE_LOG(LogTemp, Error, TEXT("Number of Observations does not match expected size :("));
+	}*/
+	
+		for (int idx = 0; idx < msg.Num(); idx++) {
 
-	for (int idx = 0; idx < msg.Num(); idx++) {
-		
-		DataS = msg.GetData() + idx;
-		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
-		UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
-		UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
-	}
+			DataS = msg.GetData() + idx;
+			ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
+			UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
+			UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
+		}
 	
 
+}
+void APole::SendState(TArray<float> Observations, int32 Reward, bool Done) {
+	TArray<double> state;
+	double obs_data;
+	for (int i = 0; i < Observations.Num(); i++) {
+		obs_data = *(Observations.GetData() + i);
+		UE_LOG(LogTemp, Warning, TEXT("Data: %f"), obs_data);
+		state.Add(StaticCast<double>(obs_data));
+
+	}
+	double s_reward = StaticCast<double>(Reward);
+	double s_done = StaticCast<double>(Done);
+	state.Add(s_reward);
+	state.Add(s_done);
+	SendData(state);
+
+}
+void APole::SetSpaces(int obs, int actions) {
+	n_obs = obs;
+	n_actions = actions;
 }
 
 

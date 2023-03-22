@@ -34,7 +34,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 		bool IsConnectionOpen = false;
-	
+
 	UPROPERTY(BlueprintReadOnly)
 		bool connected = false;
 
@@ -65,7 +65,7 @@ public:
 		AWorldSettings* WorldSettings;
 
 
-		
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float data = 0;
@@ -75,7 +75,9 @@ public:
 
 	uint8* DataRecv = new uint8[32];
 	TArray<float> DataSnd;
-	
+	int n_obs = 0;
+	int n_actions = 0;
+
 	TArray<uint8> DataToSend;
 	float* DataSend;
 
@@ -91,18 +93,21 @@ public:
 		void Conduct_Connection();
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
-		TArray<float>  ParseData(TArray<uint8> msg);
+		TArray<float>  GetAction(TArray<uint8> msg);
 
-	void SendData(TArray<uint8> msg);
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void SendState(TArray<float> Observations, int32 Reward, bool Done);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SendDouble"), Category = "Socket")
-		void SendDouble(TArray<double> msg);
+
+	void SendData(TArray<double> msg);
 
 	//UFUNCTION(BlueprintCallable, Category = "Training")
 		//bool CheckDone(float done);
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void StartServer(FString ipAddress, int32 port);
 
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void SetSpaces(int obs, int actions);
 
 	//UFUNCTION(BlueprintCallable)
 		//void OnRData(float DataR);
