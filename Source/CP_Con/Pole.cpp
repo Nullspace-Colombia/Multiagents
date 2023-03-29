@@ -81,7 +81,7 @@ void APole::Conduct_Connection() {
 
 
 
-						ReceivedData.Init(0, 64);
+						ReceivedData.Init(0, 128);
 						ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread);
 							//ParseData(DataRecv, bytesread);
 						OnDataReceptionDelegate.Broadcast(ReceivedData);
