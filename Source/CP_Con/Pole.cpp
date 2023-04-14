@@ -236,6 +236,7 @@ void APole::SendData(TArray<double> msg) {
 
 }
 void APole::SendState(TArray<float> Observations, float Reward, bool Done) {
+
 	TArray<double> state;
 	double obs_data;
 	for (int i = 0; i < Observations.Num(); i++) {
@@ -251,6 +252,26 @@ void APole::SendState(TArray<float> Observations, float Reward, bool Done) {
 	SendData(state);
 
 }
+
+
+void APole::SendAgentInfo(FString ID, TArray<float> Observations, float Reward, bool Done) {
+
+	RLAgent Agent;
+	Agent.ID = ID;
+	Agent.Observations = Observations;
+	Agent.Reward = Reward;
+	Agent.Done = Done;
+
+	FString JSONPayload;
+	FJsonObjectConverter::UStructToJsonObjectString(Agent, JSONPayload, 0, 0);
+	FString* DataS;
+	int32 BytesSent = 0;
++
+	
+	ConnectionSocket->Send((uint8*)&JSONPayload, sizeof(JSONPayload), BytesSent);
+
+}
+
 void APole::SetSpaces(int obs, int actions) {
 	n_obs = obs;
 	n_actions = actions;

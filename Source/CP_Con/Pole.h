@@ -12,6 +12,10 @@
 #include "SocketSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "Pole.generated.h"
+#include "Json.h"
+#include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
+
+
 
 //Declaring the delegates signature
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataReceptionSignature, TArray<uint8>, DataR);
@@ -46,6 +50,23 @@ protected:
 	TFuture<void> ClientConnectionFinishedFuture;
 
 public:
+	USTRUCT()
+		struct RLAgent
+		{
+		GENERATED_BODY()
+
+		UPROPERTY()
+		FString ID;
+
+		UPROPERTY()
+		float Reward;
+
+		UPROPERTY()
+		TArray<float> Observations;
+
+		UPROPERTY()
+		bool Done;
+		};
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -97,6 +118,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void SendState(TArray<float> Observations, float Reward, bool Done);
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void SendAgentInfo(FString ID, TArray<float> Observations, float Reward, bool Done);
 
 
 	void SendData(TArray<double> msg);
