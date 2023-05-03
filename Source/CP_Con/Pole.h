@@ -11,9 +11,10 @@
 #include "Async/Async.h"
 #include "SocketSubsystem.h"
 #include "Camera/CameraComponent.h"
-#include "Pole.generated.h"
 #include "Json.h"
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
+#include "Pole.generated.h"
+
 
 
 
@@ -41,6 +42,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 		bool connected = false;
+	
+
+	
 
 	bool WaitingForConnection = false;
 
@@ -50,23 +54,7 @@ protected:
 	TFuture<void> ClientConnectionFinishedFuture;
 
 public:
-	USTRUCT()
-		struct RLAgent
-		{
-		GENERATED_BODY()
 
-		UPROPERTY()
-		FString ID;
-
-		UPROPERTY()
-		float Reward;
-
-		UPROPERTY()
-		TArray<float> Observations;
-
-		UPROPERTY()
-		bool Done;
-		};
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -90,25 +78,28 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float data = 0;
-
-
+			
 
 
 	uint8* DataRecv = new uint8[32];
 	TArray<float> DataSnd;
 	int n_obs = 0;
 	int n_actions = 0;
-
+	
+	
 	TArray<uint8> DataToSend;
 	float* DataSend;
 
 	uint8* DataSendPtr;
 	uint32 buffsize = 0;
 	int32 bytesread = 0;
-
+	
 	float* data_ptr;
 	void Open_Connection();
 	void Close_Connection();
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void GetAgentInfo(TArray<uint8> msg, FString& AgentID, float &AgentAction);
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void Conduct_Connection();
@@ -120,9 +111,17 @@ public:
 		void SendState(TArray<float> Observations, float Reward, bool Done);
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
-		void SendAgentInfo(FString ID, TArray<float> Observations, float Reward, bool Done);
+		void SendAgentInfo(FString Agent_ID, TArray<float> Agent_Observations, float Agent_Reward, bool Agent_Done);
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		TArray<double> AddAgent(int ID, TArray<float> Observations, float Reward, bool Done);
+
+	UFUNCTION(BlueprintPure, meta = (CommutativeAssociativeBinaryOperator = "true"), Category = "Socket")
+		TArray<double> GetAgentsInfo(TArray<double> A, TArray<double> B);
 
 
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void SendMultiagentsInfo(TArray<double> Multiagents);
 	void SendData(TArray<double> msg);
 
 	//UFUNCTION(BlueprintCallable, Category = "Training")
@@ -130,7 +129,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void StartServer(FString ipAddress, int32 port);
 
-	UFUNCTION(BlueprintCallable, Category = "Socket")
+		UFUNCTION(BlueprintCallable, Category = "Socket")
 		void SetSpaces(int obs, int actions);
 
 	//UFUNCTION(BlueprintCallable)
@@ -167,4 +166,25 @@ public:
 
 	FSocket* ListenSocket;
 	FSocket* ConnectionSocket;
+};
+
+USTRUCT(BlueprintType)
+struct FRLAgent
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Reward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<float> Observations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Done;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Action;
 };

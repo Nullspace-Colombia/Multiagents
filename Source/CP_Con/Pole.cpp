@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
- 
 #include "Pole.h"
 // Sets default values
 APole::APole()
@@ -81,7 +80,7 @@ void APole::Conduct_Connection() {
 
 
 
-						ReceivedData.Init(0, 64);
+						ReceivedData.Init(0, 128);
 						ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread);
 							//ParseData(DataRecv, bytesread);
 						OnDataReceptionDelegate.Broadcast(ReceivedData);
@@ -235,6 +234,9 @@ void APole::SendData(TArray<double> msg) {
 	
 
 }
+void APole::SendMultiagentsInfo(TArray<double> Multiagents) {
+	SendData(Multiagents);
+}
 void APole::SendState(TArray<float> Observations, float Reward, bool Done) {
 
 	TArray<double> state;
@@ -254,28 +256,78 @@ void APole::SendState(TArray<float> Observations, float Reward, bool Done) {
 }
 
 
-void APole::SendAgentInfo(FString ID, TArray<float> Observations, float Reward, bool Done) {
+void APole::SendAgentInfo(FString Agent_ID, TArray<float> Agent_Observations, float Agent_Reward, bool Agent_Done) {
 
-	RLAgent Agent;
-	Agent.ID = ID;
-	Agent.Observations = Observations;
-	Agent.Reward = Reward;
-	Agent.Done = Done;
+	FRLAgent Agent;
+	Agent.ID = Agent_ID;
+	Agent.Observations = Agent_Observations;
+	Agent.Reward = Agent_Reward;
+	Agent.Done = Agent_Done;
+	Agent.Action = 0;
 
 	FString JSONPayload;
 	FJsonObjectConverter::UStructToJsonObjectString(Agent, JSONPayload, 0, 0);
-	FString* DataS;
-	int32 BytesSent = 0;
-+
+	UE_LOG(LogTemp, Warning, TEXT("Data: %s"), *JSONPayload);
+	UE_LOG(LogTemp, Warning, TEXT("Size of Data: %d"), JSONPayload.Len());
+	//ConnectionSocket->Send((uint8*)&JSONPayload, sizeof(JSONPayload), BytesSent);
 	
-	ConnectionSocket->Send((uint8*)&JSONPayload, sizeof(JSONPayload), BytesSent);
+	FString* DataS;
+	FString* Json_Array = &(JSONPayload);
+	int32 BytesSent = 0;
 
+	for (int idx = 0; idx < JSONPayload.Len(); idx++) {
+		DataS =  Json_Array + idx;
+		ConnectionSocket->Send((uint8*)DataS, sizeof(DataS), BytesSent);
+		UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
+	}
+}
+
+void APole::GetAgentInfo(TArray<uint8> msg, FString &AgentID, float &AgentAction) {
+	FRLAgent Agent;
+	FString JSONInfo;
+
+	//const std::string cstr(reinterpret_cast<const char*>(msg.GetData()), msg.Num());
+
+	//JSONInfo = FString(cstr.c_str());
+
+	//FJsonObjectConverter::JsonObjectStringToUStruct(JSONInfo, &Agent, 0, 0);
+	//AgentID = Agent.ID;
+	//AgentAction = Agent.Action;
 }
 
 void APole::SetSpaces(int obs, int actions) {
 	n_obs = obs;
 	n_actions = actions;
 }
+
+// Orden: Identificador, Longitud de observaciones, Arreglo de observaciones, Reward, Done
+TArray<double> APole::AddAgent(int ID, TArray<float> Observations, float Reward, bool Done) {
+	TArray<double> AgentInfo;
+	double s_id = StaticCast<double>(ID);
+	AgentInfo.Add(s_id);
+	double obs_data;
+	for (int i = 0; i < Observations.Num(); i++) {
+		obs_data = *(Observations.GetData() + i);
+		UE_LOG(LogTemp, Warning, TEXT("Data: %f"), obs_data);
+		AgentInfo.Add(StaticCast<double>(obs_data));
+
+	}
+	double s_reward = StaticCast<double>(Reward);
+	double s_done = StaticCast<double>(Done);
+	
+	AgentInfo.Add(s_reward);
+	AgentInfo.Add(s_done);
+
+	return AgentInfo;
+}
+
+TArray<double> APole::GetAgentsInfo(TArray<double> A, TArray<double> B) {
+	TArray<double> Agents;
+	Agents = A;
+	Agents.Append(B);
+	return Agents;
+}
+
 
 
 
