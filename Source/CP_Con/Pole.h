@@ -160,7 +160,6 @@ public:
 	//UFUNCTION(BlueprintCallable)
 		//TArray<uint8> get_Data();
 
-	void Reset_Env();
 
 	float Timer = 0;
 

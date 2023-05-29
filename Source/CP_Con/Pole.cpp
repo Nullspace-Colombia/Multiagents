@@ -140,13 +140,6 @@ void APole::GetReceivedData() {
 	//DataReceptionDelegate.Broadcast(ReceivedData);
 }
 
-void APole::Reset_Env() {
-	UE_LOG(LogTemp, Warning, TEXT("Environment Reset"));
-	//FVector currLocation = Base->GetComponentLocation();
-	//currLocation.X = 0;
-	//Base->SetWorldLocation(currLocation);
-}
-
 void APole::StartServer(FString ipAddress, int32 port){
 	if (!IsConnectionOpen) {
 		UE_LOG(LogTemp, Warning, TEXT("Openning Connection"));
@@ -205,13 +198,13 @@ TArray<float> APole::GetAction(TArray<uint8> msg) {
 	data_ptr = reinterpret_cast<float*>(msg.GetData());
 
 	int buff_size = bytesread / 4;
-	UE_LOG(LogTemp, Warning, TEXT("Buffer Size: %d"), bytesread);
+	//UE_LOG(LogTemp, Warning, TEXT("Buffer Size: %d"), bytesread);
 
 	for (int idx = 0; idx < (int)buff_size; idx++) {
 			data = *(data_ptr + idx);
 			data_rcv.Add(data);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Array size: %d"), data_rcv.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("Array size: %d"), data_rcv.Num());
 	return data_rcv;
 
 }
@@ -228,8 +221,8 @@ void APole::SendData(TArray<double> msg) {
 
 			DataS = msg.GetData() + idx;
 			ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
-			UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
-			UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
+			//UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
+			//UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
 		}
 	
 
@@ -243,7 +236,7 @@ void APole::SendState(TArray<float> Observations, float Reward, bool Done) {
 	double obs_data;
 	for (int i = 0; i < Observations.Num(); i++) {
 		obs_data = *(Observations.GetData() + i);
-		UE_LOG(LogTemp, Warning, TEXT("Data: %f"), obs_data);
+		//UE_LOG(LogTemp, Warning, TEXT("Data: %f"), obs_data);
 		state.Add(StaticCast<double>(obs_data));
 
 	}
@@ -267,8 +260,8 @@ void APole::SendAgentInfo(FString Agent_ID, TArray<float> Agent_Observations, fl
 
 	FString JSONPayload;
 	FJsonObjectConverter::UStructToJsonObjectString(Agent, JSONPayload, 0, 0);
-	UE_LOG(LogTemp, Warning, TEXT("Data: %s"), *JSONPayload);
-	UE_LOG(LogTemp, Warning, TEXT("Size of Data: %d"), JSONPayload.Len());
+	//UE_LOG(LogTemp, Warning, TEXT("Data: %s"), *JSONPayload);
+	//UE_LOG(LogTemp, Warning, TEXT("Size of Data: %d"), JSONPayload.Len());
 	//ConnectionSocket->Send((uint8*)&JSONPayload, sizeof(JSONPayload), BytesSent);
 	
 	FString* DataS;
@@ -278,7 +271,7 @@ void APole::SendAgentInfo(FString Agent_ID, TArray<float> Agent_Observations, fl
 	for (int idx = 0; idx < JSONPayload.Len(); idx++) {
 		DataS =  Json_Array + idx;
 		ConnectionSocket->Send((uint8*)DataS, sizeof(DataS), BytesSent);
-		UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
+		//UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
 	}
 }
 
@@ -308,7 +301,7 @@ TArray<double> APole::AddAgent(int ID, TArray<float> Observations, float Reward,
 	double obs_data;
 	for (int i = 0; i < Observations.Num(); i++) {
 		obs_data = *(Observations.GetData() + i);
-		UE_LOG(LogTemp, Warning, TEXT("Data: %f"), obs_data);
+		//UE_LOG(LogTemp, Warning, TEXT("Data: %f"), obs_data);
 		AgentInfo.Add(StaticCast<double>(obs_data));
 
 	}
