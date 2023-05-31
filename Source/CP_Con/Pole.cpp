@@ -61,7 +61,7 @@ void APole::Conduct_Connection() {
 			connected = true;
 			// Start Recv Thread
 			ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
-				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
+				//UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
 				//Sending a confirmation array:
 				//TArray<uint8> Confirmation;
 				//Confirmation.Add(0);
