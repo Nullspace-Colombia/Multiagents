@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
- 
 #include "Pole.h"
 // Sets default values
 APole::APole()
@@ -9,9 +8,9 @@ APole::APole()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//otComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
-	Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Cam->SetupAttachment(RootComponent);
+	//Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
+	//Cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	//Cam->SetupAttachment(RootComponent);
 	
 	//
 }
@@ -20,7 +19,7 @@ APole::APole()
 void APole::BeginPlay()
 {
 	Super::BeginPlay();
-	Open_Connection();
+	//Open_Connection();
 
 }
 
@@ -39,7 +38,7 @@ void APole::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-	Conduct_Connection();
+	//Conduct_Connection();
 
 }
 
@@ -59,70 +58,105 @@ void APole::Conduct_Connection() {
 			ConnectionSocket = ListenSocket->Accept(*RemoteAddress, TEXT("Connection"));
 			WaitingForConnection = false;
 			UE_LOG(LogTemp, Warning, TEXT("incoming connection"));
-
+			connected = true;
 			// Start Recv Thread
 			ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
 				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
+				//Sending a confirmation array:
+				//TArray<uint8> Confirmation;
+				//Confirmation.Add(0);
+				//Confirmation.Add(1);
+				//Confirmation.Add(2);
+				//Confirmation.Add(3);
+				//SendData(Confirmation);
+
 				while (IsConnectionOpen) {
 					uint32 size;
-					int32 BytesSent = 0;
-
+					TArray<uint8> ReceivedData;
+					//int32 BytesSent = 0;
+					
 					if (ConnectionSocket->HasPendingData(size)) {
 						//TArray<uint8> ReceivedData;
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-						UE_LOG(LogTemp, Warning, TEXT("Size of Data Pending:  %d"), size);
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
 
-						//ReceivedData.Init(0, 10);
-						if (ConnectionSocket->Recv(DataRecv, size, bytesread)) {
-							UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-							UE_LOG(LogTemp, Warning, TEXT("Bytes Received:  %d"), bytesread);
-							UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-							ParseData(DataRecv, bytesread);
-						}
+
+
+						ReceivedData.Init(0, 128);
+						ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread);
+							//ParseData(DataRecv, bytesread);
+						OnDataReceptionDelegate.Broadcast(ReceivedData);
+							//OnReceivedData(ReceivedData);
+							//OnReceivedDataPtr(ReceivedData.GetData());
+						
+						/*
 						FVector currLocation = Base->GetComponentLocation();
-						//DataSend = (uint8*)&currLocation.Y;
-						//ConnectionSocket->Send(DataSend, size, BytesSent);
 						DataSnd.Add(currLocation.X);
 						DataSnd.Add(currLocation.Y);
 						DataSnd.Add(currLocation.Z);
 						DataSnd.Add(currLocation.X);
+
+						DataToSend.Add(currLocation.X);
+						DataToSend.Add(currLocation.Y);
+						DataToSend.Add(currLocation.Z);
+						DataToSend.Add(currLocation.X);
 						
-					
-						DataSend = DataSnd.GetData();
-						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
-						DataSend = DataSnd.GetData()+1;
-						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
-						DataSend = DataSnd.GetData()+2;
-						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
-						DataSend = DataSnd.GetData()+3;
-						ConnectionSocket->Send(reinterpret_cast<uint8*>(DataSend), DataSnd.Num(), BytesSent);
-
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-						UE_LOG(LogTemp, Warning, TEXT("Buffer Size:  %d"), BytesSent);
-						UE_LOG(LogTemp, Warning, TEXT("Size of the data to send:  %d"), DataSnd.Num());
-
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-						UE_LOG(LogTemp, Warning, TEXT("Posición en X:  %f"), currLocation.X);
-						UE_LOG(LogTemp, Warning, TEXT("Posición en Y:  %f"), currLocation.Y);
-						UE_LOG(LogTemp, Warning, TEXT("Posición en Z:  %f"), currLocation.Z);
-						UE_LOG(LogTemp, Warning, TEXT("----------------------------------"));
-						DataSnd.Reset();
-					
-
+						SendData(DataToSend);
+						DataToSend.Reset();
+						*/
+						ReceivedData.Reset();
 					}
-
+					
 				}
 				});
+			//UE_LOG(LogTemp, Warning, TEXT("After thread execution"));
+			
 		}
 	}
 }
 
-void APole::Reset_Env() {
-	UE_LOG(LogTemp, Warning, TEXT("Environment Reset"));
-	FVector currLocation = Base->GetComponentLocation();
-	currLocation.X = 0;
-	Base->SetWorldLocation(currLocation);
+/*
+void APole::OnReceivedData(TArray<uint8> DataR) {
+	if (DataR.IsEmpty()) {
+		DataR.Add(1);
+	}
+	OnDataReceptionDelegate.Broadcast(DataR);
+}*/
+
+/*
+void APole::OnRData(float DataR) {
+	OnDataReceiveDelegate.Broadcast(DataR);
+}*/
+
+/*
+void APole::OnReceivedDataPtr(TArray<uint8>* DataR) {
+	OnDataReceptionDelegate.Broadcast(DataR);
+}*/
+
+/*
+void APole::RecibirEntero(int32 entero) {
+
+}*/
+
+void APole::GetReceivedData() {
+	//DataReceptionDelegate.Broadcast(ReceivedData);
+}
+
+void APole::StartServer(FString ipAddress, int32 port){
+	if (!IsConnectionOpen) {
+		UE_LOG(LogTemp, Warning, TEXT("Openning Connection"));
+		IsConnectionOpen = true;
+		WaitingForConnection = true;
+
+		FIPv4Address IPAddress;
+		FIPv4Address::Parse(ipAddress, IPAddress);
+		FIPv4Endpoint Endpoint(IPAddress, (uint16)port);
+
+		ListenSocket = FTcpSocketBuilder(TEXT("TcpSocket")).AsReusable();
+
+		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+		ListenSocket->Bind(*SocketSubsystem->CreateInternetAddr(Endpoint.Address.Value, Endpoint.Port));
+		ListenSocket->Listen(1);
+		UE_LOG(LogTemp, Warning, TEXT("Listening"));
+	}
 }
 
 void APole::Open_Connection() {
@@ -153,30 +187,141 @@ void APole::Close_Connection() {
 	}
 }
 
-/*
-void APole::ParseData(uint8* msg) {
-	data_ptr = reinterpret_cast<float*>(msg);
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 1));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 2));
-	UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), *(data_ptr + 3));
-}*/
+TArray<float> APole::GetAction(TArray<uint8> msg) {
+	/*if (msg.Num() != n_actions) {
+		TArray<float> empty_actions;
+		UE_LOG(LogTemp, Error, TEXT("Number of Actions does not match expected size :("));
+		return empty_actions;
+	}*/
 
-// buffsize 
-void APole::ParseData(uint8* msg, uint32 size) {
-	data_ptr = reinterpret_cast<float*>(msg);
-	int buff_size = (int)*data_ptr;
-	
+	TArray<float> data_rcv;
+	data_ptr = reinterpret_cast<float*>(msg.GetData());
 
-	for (int idx = 1; idx < (int)buff_size + 1; idx++) {
-		data = *(data_ptr + idx);
-		UE_LOG(LogTemp, Warning, TEXT("Received data: %f"), data);
-		
+	int buff_size = bytesread / 4;
+	//UE_LOG(LogTemp, Warning, TEXT("Buffer Size: %d"), bytesread);
+
+	for (int idx = 0; idx < (int)buff_size; idx++) {
+			data = *(data_ptr + idx);
+			data_rcv.Add(data);
 	}
-
+	//UE_LOG(LogTemp, Warning, TEXT("Array size: %d"), data_rcv.Num());
+	return data_rcv;
 
 }
-/*
-void APole::SendData(TArray<float> msg) {
 
-}*/
+void APole::SendData(TArray<double> msg) {
+	
+	double* DataS;
+	int32 BytesSent = 0;
+	/*if (msg.Num() - 2 != n_obs) {
+		UE_LOG(LogTemp, Error, TEXT("Number of Observations does not match expected size :("));
+	}*/
+	
+		for (int idx = 0; idx < msg.Num(); idx++) {
+
+			DataS = msg.GetData() + idx;
+			ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
+			//UE_LOG(LogTemp, Warning, TEXT("Sending: %f"), *DataS);
+			//UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
+		}
+	
+
+}
+void APole::SendMultiagentsInfo(TArray<double> Multiagents) {
+	SendData(Multiagents);
+}
+void APole::SendState(TArray<float> Observations, float Reward, bool Done) {
+
+	TArray<double> state;
+	double obs_data;
+	for (int i = 0; i < Observations.Num(); i++) {
+		obs_data = *(Observations.GetData() + i);
+		//UE_LOG(LogTemp, Warning, TEXT("Data: %f"), obs_data);
+		state.Add(StaticCast<double>(obs_data));
+
+	}
+	double s_reward = StaticCast<double>(Reward);
+	double s_done = StaticCast<double>(Done);
+	state.Add(s_reward);
+	state.Add(s_done);
+	SendData(state);
+
+}
+
+
+void APole::SendAgentInfo(FString Agent_ID, TArray<float> Agent_Observations, float Agent_Reward, bool Agent_Done) {
+
+	FRLAgent Agent;
+	Agent.ID = Agent_ID;
+	Agent.Observations = Agent_Observations;
+	Agent.Reward = Agent_Reward;
+	Agent.Done = Agent_Done;
+	Agent.Action = 0;
+
+	FString JSONPayload;
+	FJsonObjectConverter::UStructToJsonObjectString(Agent, JSONPayload, 0, 0);
+	//UE_LOG(LogTemp, Warning, TEXT("Data: %s"), *JSONPayload);
+	//UE_LOG(LogTemp, Warning, TEXT("Size of Data: %d"), JSONPayload.Len());
+	//ConnectionSocket->Send((uint8*)&JSONPayload, sizeof(JSONPayload), BytesSent);
+	
+	FString* DataS;
+	FString* Json_Array = &(JSONPayload);
+	int32 BytesSent = 0;
+
+	for (int idx = 0; idx < JSONPayload.Len(); idx++) {
+		DataS =  Json_Array + idx;
+		ConnectionSocket->Send((uint8*)DataS, sizeof(DataS), BytesSent);
+		//UE_LOG(LogTemp, Warning, TEXT("BytesSent: %d"), BytesSent);
+	}
+}
+
+void APole::GetAgentInfo(TArray<uint8> msg, FString &AgentID, float &AgentAction) {
+	FRLAgent Agent;
+	FString JSONInfo;
+
+	//const std::string cstr(reinterpret_cast<const char*>(msg.GetData()), msg.Num());
+
+	//JSONInfo = FString(cstr.c_str());
+
+	//FJsonObjectConverter::JsonObjectStringToUStruct(JSONInfo, &Agent, 0, 0);
+	//AgentID = Agent.ID;
+	//AgentAction = Agent.Action;
+}
+
+void APole::SetSpaces(int obs, int actions) {
+	n_obs = obs;
+	n_actions = actions;
+}
+
+// Orden: Identificador, Longitud de observaciones, Arreglo de observaciones, Reward, Done
+TArray<double> APole::AddAgent(int ID, TArray<float> Observations, float Reward, bool Done) {
+	TArray<double> AgentInfo;
+	double s_id = StaticCast<double>(ID);
+	AgentInfo.Add(s_id);
+	double obs_data;
+	for (int i = 0; i < Observations.Num(); i++) {
+		obs_data = *(Observations.GetData() + i);
+		//UE_LOG(LogTemp, Warning, TEXT("Data: %f"), obs_data);
+		AgentInfo.Add(StaticCast<double>(obs_data));
+
+	}
+	double s_reward = StaticCast<double>(Reward);
+	double s_done = StaticCast<double>(Done);
+	
+	AgentInfo.Add(s_reward);
+	AgentInfo.Add(s_done);
+
+	return AgentInfo;
+}
+
+TArray<double> APole::GetAgentsInfo(TArray<double> A, TArray<double> B) {
+	TArray<double> Agents;
+	Agents = A;
+	Agents.Append(B);
+	return Agents;
+}
+
+
+
+
+
