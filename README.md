@@ -39,8 +39,8 @@ Once you do this, in the blueprint functions, you'll now have these functions:
 ![Override_Functions](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/8709d437-53fb-4371-88bb-e4f8141d11a5)
 
 |```Get Reward```| Agent Reward | 
-| ```Is Done```|  |
-| ```Reset```  |  |
+| ```Is Done```| d |
+| ```Reset```  |  d |
 | ```Get State``` | Agent observations |
 | ```Step``` | Actions the agent takes in each step|
 
