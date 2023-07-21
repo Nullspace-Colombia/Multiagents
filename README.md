@@ -38,15 +38,17 @@ Once you do this, in the blueprint functions, you'll now have these functions:
 
 ![Override_Functions](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/8709d437-53fb-4371-88bb-e4f8141d11a5)
 
+You have to implement these functions according to your enviornment. 
+
 | Function | Description |
 |--------|---------|
 |```Get Reward```| Agent Reward | 
-| ```Is Done```| d |
-| ```Reset```  |  d |
-| ```Get State``` | Agent observations |
-| ```Step``` | Actions the agent takes in each step|
+| ```Is Done```| Function to specify the way the agent finishes the environment |
+| ```Reset```  |  Reset the agent. ```Create Actor``` -> True if you want to destroy the actor and spawn it again in a nuew place. |
+| ```Get State``` | Get agent observations |
+| ```Step``` | What the agent does in each step |
 
-When you've implemented all these functions and you want to try your environment, you'll have to add a Connector to your map.
+When you've implemented all these functions and you want to try your environment, you'll have to add a **Connector** to your map.
 
 In the Blueprints folder, you'll find the connectors for both single agent envs and multiagent envs:
 
@@ -54,7 +56,7 @@ In the Blueprints folder, you'll find the connectors for both single agent envs 
 
 ### Single Agent Environments
 
-If your environment is a single agent env, all you need to do is place a BP_Connector instance in your map. 
+If your environment is a single agent env, all you need to do is place a ```BP_Connector``` instance in your map. 
 
 If you want to modify the IP and port, open the BP_Connector blueprint and in the ```Start Connection``` section, change them to your liking.
 
@@ -62,7 +64,7 @@ If you want to modify the IP and port, open the BP_Connector blueprint and in th
 
 ### MultiAgent Environments
 
-If your environment is a multiagent env, you'll need to place a BP_Connector_MA instance in your map. Once you do, you can select it and in the details panel you'll find the Default section. There, you'll find an array called Actor Agents. 
+If your environment is a multiagent env, you'll need to place a ```BP_Connector_MA``` instance in your map. Once you do, you can select it and in the details panel you'll find the Default section. There, you'll find an array called Actor Agents. 
 
 ![ConnectorMA_Panel](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/5989c256-024c-4386-b8c5-a585d493488f)
 
