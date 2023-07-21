@@ -56,11 +56,13 @@ In the Blueprints folder, you'll find the connectors for both single agent envs 
 
 ### Single Agent Environments
 
-If your environment is a single agent env, all you need to do is place a ```BP_Connector``` instance in your map. 
+If your environment is a single agent env, place a ```BP_Connector``` instance in your map. Once you do, you can select it and in the details panel you'll find the Default section. There, you'll find an Actor Agent variable, assign your agent to this variable. 
 
-If you want to modify the IP and port, open the BP_Connector blueprint and in the ```Start Connection``` section, change them to your liking.
+If you want to modify the IP and port, in the details panel you can input both parameters to your liking. The default values are: ``` IP = 127.0.0.1 ``` and ``` Port = 10010```
 
-![ConnectorADD](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/94a89e7c-3ad6-4adb-85e3-1b59e66079ea)
+![Details_Connector](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/52acb043-5e69-4bbb-b164-3f38f6607908)
+
+
 
 ### MultiAgent Environments
 
@@ -70,9 +72,10 @@ If your environment is a multiagent env, you'll need to place a ```BP_Connector_
 
 To ensure the framework can recognise all the agents in your environment, add each agent to the array. 
 
-If you want to modify the IP and port, open the BP_Connector blueprint and in the ```Start Connection``` section, change them to your liking.
+If you want to modify the IP and port, in the details panel you can input both parameters to your liking. The default values are: ``` IP = 127.0.0.1 ``` and ``` Port = 10011```
 
-![ConnectorADD](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/bc371081-ff85-464b-ae80-3bd6943b92d7)
+![Details_Connector_MA](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/0c17fb39-52d6-435e-8ff4-488a76d59db9)
+
 
 
 
