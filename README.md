@@ -38,6 +38,7 @@ Once you do this, in the blueprint functions, you'll now have these functions:
 
 ![Override_Functions](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/8709d437-53fb-4371-88bb-e4f8141d11a5)
 
+| Function | Description |
 |```Get Reward```| Agent Reward | 
 | ```Is Done```| d |
 | ```Reset```  |  d |
