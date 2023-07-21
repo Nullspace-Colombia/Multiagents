@@ -159,6 +159,77 @@ void APole::StartServer(FString ipAddress, int32 port){
 	}
 }
 
+void APole::StartClient(FString ipAddress, int32 port) {
+	FIPv4Address IPAddress;
+	FIPv4Address::Parse(ipAddress, IPAddress);
+	FIPv4Endpoint Endpoint(IPAddress, (uint16)port);
+
+	ClientSocket = FTcpSocketBuilder(TEXT("TcpClientSocket")).AsReusable();
+	ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+	if (ClientSocket->Connect(*SocketSubsystem->CreateInternetAddr(Endpoint.Address.Value, Endpoint.Port))) {
+		UE_LOG(LogTemp, Warning, TEXT("Client Connect Success"));
+		IsConnectionOpen = true;
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Client Connect Failed"));
+	}
+	
+
+
+}
+
+void APole::ConnectionClient() {
+	connected = true;
+	// Start Recv Thread
+	ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
+		UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
+		//Sending a confirmation array:
+		//TArray<uint8> Confirmation;
+		//Confirmation.Add(0);
+		//Confirmation.Add(1);
+		//Confirmation.Add(2);
+		//Confirmation.Add(3);
+		//SendData(Confirmation);
+
+		while (IsConnectionOpen) {
+			uint32 size;
+			TArray<uint8> ReceivedData;
+			//int32 BytesSent = 0;
+
+			if (ClientSocket->HasPendingData(size)) {
+				//TArray<uint8> ReceivedData;
+
+
+
+				ReceivedData.Init(0, 128);
+				ClientSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread);
+				//ParseData(DataRecv, bytesread);
+				OnDataReceptionDelegate.Broadcast(ReceivedData);
+				//OnReceivedData(ReceivedData);
+				//OnReceivedDataPtr(ReceivedData.GetData());
+
+			/*
+			FVector currLocation = Base->GetComponentLocation();
+			DataSnd.Add(currLocation.X);
+			DataSnd.Add(currLocation.Y);
+			DataSnd.Add(currLocation.Z);
+			DataSnd.Add(currLocation.X);
+
+			DataToSend.Add(currLocation.X);
+			DataToSend.Add(currLocation.Y);
+			DataToSend.Add(currLocation.Z);
+			DataToSend.Add(currLocation.X);
+
+			SendData(DataToSend);
+			DataToSend.Reset();
+			*/
+				ReceivedData.Reset();
+			}
+
+		}
+		});
+}
+
 void APole::Open_Connection() {
 	if (!IsConnectionOpen) {
 		UE_LOG(LogTemp, Warning, TEXT("Openning Connection"));

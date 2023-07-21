@@ -105,6 +105,9 @@ public:
 		void Conduct_Connection();
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void ConnectionClient();
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
 		TArray<float>  GetAction(TArray<uint8> msg);
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
@@ -131,6 +134,9 @@ public:
 
 		UFUNCTION(BlueprintCallable, Category = "Socket")
 		void SetSpaces(int obs, int actions);
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void StartClient(FString ipAddress, int32 port);
 
 	//UFUNCTION(BlueprintCallable)
 		//void OnRData(float DataR);
@@ -165,6 +171,7 @@ public:
 
 	FSocket* ListenSocket;
 	FSocket* ConnectionSocket;
+	FSocket* ClientSocket;
 };
 
 USTRUCT(BlueprintType)
