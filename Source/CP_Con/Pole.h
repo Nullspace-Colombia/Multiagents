@@ -89,6 +89,9 @@ public:
 	void SendData(TArray<double> msg);
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
+		void StartClient(FString ipAddress, int32 port);
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
 		void StartServer(FString ipAddress, int32 port);
 	
 	UPROPERTY(BlueprintAssignable)
@@ -99,5 +102,6 @@ public:
 
 	FSocket* ListenSocket;
 	FSocket* ConnectionSocket;
+	FSocket* ClientSocket;
 };
 

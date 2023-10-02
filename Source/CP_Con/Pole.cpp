@@ -83,6 +83,28 @@ void APole::GetReceivedData() {
 	
 }
 
+void APole::StartClient(FString ipAddress, int32 port) {
+	FIPv4Address IPAddress;
+	FIPv4Address::Parse(ipAddress, IPAddress);
+	FIPv4Endpoint Endpoint(IPAddress, (uint16)port);
+
+	ClientSocket = FTcpSocketBuilder(TEXT("TcpSocket")).AsReusable();
+
+	ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+	
+	if (ClientSocket->Connect(*SocketSubsystem->CreateInternetAddr(Endpoint.Address.Value, Endpoint.Port)))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Connect Succeed!"));
+		//return true;
+	}
+	//Connection failed
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Connect Failed!"));
+		//return false;
+	}
+}	
+
 void APole::StartServer(FString ipAddress, int32 port){
 	if (!IsConnectionOpen) {
 		UE_LOG(LogTemp, Warning, TEXT("Openning Connection"));
@@ -97,7 +119,7 @@ void APole::StartServer(FString ipAddress, int32 port){
 
 		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 		ListenSocket->Bind(*SocketSubsystem->CreateInternetAddr(Endpoint.Address.Value, Endpoint.Port));
-		ListenSocket->Listen(1);
+		ListenSocket->Listen(10);
 		UE_LOG(LogTemp, Warning, TEXT("Listening"));
 	}
 }
