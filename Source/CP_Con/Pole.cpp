@@ -50,7 +50,7 @@ void APole::Conduct_Connection() {
 			connected = true;
 			// Start Recv Thread
 			ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
-				UE_LOG(LogTemp, Warning, TEXT("recv thread started"));
+				UE_LOG(LogTemp, Warning, TEXT("recv thread started in port: %d"), ListenSocket->GetPortNo());
 				//Sending a confirmation array:
 
 				while (IsConnectionOpen) {
@@ -63,8 +63,9 @@ void APole::Conduct_Connection() {
 
 						ReceivedData.Init(0, 128);
 						ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread);
+						
 						OnDataReceptionDelegate.Broadcast(ReceivedData);
-
+						//UE_LOG(LogTemp, Warning, TEXT("received"));
 
 						ReceivedData.Reset();
 					}
@@ -84,7 +85,7 @@ void APole::GetReceivedData() {
 }
 
 void APole::StartServer(FString ipAddress, int32 port){
-	if (!IsConnectionOpen) {
+
 		UE_LOG(LogTemp, Warning, TEXT("Openning Connection"));
 		IsConnectionOpen = true;
 		WaitingForConnection = true;
@@ -99,7 +100,7 @@ void APole::StartServer(FString ipAddress, int32 port){
 		ListenSocket->Bind(*SocketSubsystem->CreateInternetAddr(Endpoint.Address.Value, Endpoint.Port));
 		ListenSocket->Listen(1);
 		UE_LOG(LogTemp, Warning, TEXT("Listening"));
-	}
+	
 }
 
 void APole::Open_Connection() {
@@ -149,12 +150,15 @@ void APole::SendData(TArray<double> msg) {
 	
 	double* DataS;
 	int32 BytesSent = 0;
-		for (int idx = 0; idx < msg.Num(); idx++) {
+	//UE_LOG(LogTemp, Warning, TEXT("MSG SIZE: %d"), msg.Num());
+	for (int idx = 0; idx < msg.Num(); idx++) {
 
-			DataS = msg.GetData() + idx;
-			ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
-		}
-	
+		DataS = msg.GetData() + idx;
+		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
+		//UE_LOG(LogTemp, Warning, TEXT("Data sent"));
+			
+	}
+	//UE_LOG(LogTemp, Warning, TEXT("Data sent"));
 
 }
 void APole::SendMultiagentsInfo(TArray<double> Multiagents) {
