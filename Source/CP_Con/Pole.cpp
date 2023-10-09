@@ -49,7 +49,7 @@ void APole::Conduct_Connection() {
 			UE_LOG(LogTemp, Warning, TEXT("incoming connection"));
 			connected = true;
 			// Start Recv Thread
-			ClientConnectionFinishedFuture = Async(EAsyncExecution::LargeThreadPool, [&]() {
+			ClientConnectionFinishedFuture = Async(EAsyncExecution::Thread, [&]() {
 				UE_LOG(LogTemp, Warning, TEXT("recv thread started in port: %d"), ListenSocket->GetPortNo());
 				//Sending a confirmation array:
 
@@ -69,6 +69,7 @@ void APole::Conduct_Connection() {
 
 						ReceivedData.Reset();
 					}
+
 					
 				}
 				});
@@ -148,16 +149,18 @@ TArray<float> APole::GetAction(TArray<uint8> msg) {
 
 void APole::SendData(TArray<double> msg) {
 	
-	double* DataS;
+	//double* DataS;
 	int32 BytesSent = 0;
+	int32 BufferSize = msg.Num() * 8;
 	//UE_LOG(LogTemp, Warning, TEXT("MSG SIZE: %d"), msg.Num());
-	for (int idx = 0; idx < msg.Num(); idx++) {
+	ConnectionSocket->Send(reinterpret_cast<uint8*>(msg.GetData()), BufferSize, BytesSent);
+	//for (int idx = 0; idx < msg.Num(); idx++) {
 
-		DataS = msg.GetData() + idx;
-		ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
+	//	DataS = msg.GetData() + idx;
+	//	ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
 		//UE_LOG(LogTemp, Warning, TEXT("Data sent"));
 			
-	}
+	//}
 	//UE_LOG(LogTemp, Warning, TEXT("Data sent"));
 
 }
