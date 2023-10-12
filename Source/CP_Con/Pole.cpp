@@ -65,7 +65,6 @@ void APole::Conduct_Connection() {
 						ConnectionSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), bytesread);
 						
 						OnDataReceptionDelegate.Broadcast(ReceivedData);
-						//UE_LOG(LogTemp, Warning, TEXT("received"));
 
 						ReceivedData.Reset();
 					}
@@ -149,19 +148,12 @@ TArray<float> APole::GetAction(TArray<uint8> msg) {
 
 void APole::SendData(TArray<double> msg) {
 	
-	//double* DataS;
+
 	int32 BytesSent = 0;
 	int32 BufferSize = msg.Num() * 8;
-	//UE_LOG(LogTemp, Warning, TEXT("MSG SIZE: %d"), msg.Num());
-	ConnectionSocket->Send(reinterpret_cast<uint8*>(msg.GetData()), BufferSize, BytesSent);
-	//for (int idx = 0; idx < msg.Num(); idx++) {
 
-	//	DataS = msg.GetData() + idx;
-	//	ConnectionSocket->Send(reinterpret_cast<uint8*>(DataS), 8, BytesSent);
-		//UE_LOG(LogTemp, Warning, TEXT("Data sent"));
-			
-	//}
-	//UE_LOG(LogTemp, Warning, TEXT("Data sent"));
+	ConnectionSocket->Send(reinterpret_cast<uint8*>(msg.GetData()), BufferSize, BytesSent);
+
 
 }
 void APole::SendMultiagentsInfo(TArray<double> Multiagents) {
