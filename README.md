@@ -12,7 +12,8 @@ We are currently using Unreal Engine 5.1. We recommend using the same version to
 
 In the Maps folder you'll find some examples to run:
 
-![image](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/508e8fee-18fd-4caf-80e1-506919cfb012)
+![Maps](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/dd5a8093-a6da-4c88-8731-1b993d9faec8)
+
 
 ## Custom Envs
 
@@ -44,7 +45,7 @@ You have to implement these functions according to your enviornment.
 |--------|---------|
 |```Get Reward```| Agent Reward | 
 | ```Is Done```| Function to specify the way the agent finishes the environment |
-| ```Reset```  |  Reset the agent. ```Create Actor``` -> True if you want to destroy the actor and spawn it again in a nuew place. |
+| ```Reset```  |  Reset the agent. ```Create Actor``` -> True if you want to destroy the actor and spawn it again in a new place. |
 | ```Get State``` | Get agent observations |
 | ```Step``` | What the agent does in each step |
 
@@ -52,29 +53,51 @@ When you've implemented all these functions and you want to try your environment
 
 In the Blueprints folder, you'll find the connectors for both single agent envs and multiagent envs:
 
-![Connectors](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/f4fba381-5269-40c4-a5e6-7731922d9ca1)
+![Connectors](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/d7e4c7f1-f234-4b0d-88bd-e2d2fcc188b4)
 
 ### Single Agent Environments
 
-If your environment is a single agent env, place a ```BP_Connector``` instance in your map. Once you do, you can select it and in the details panel you'll find the Default section. There, you'll find an Actor Agent variable, assign your agent to this variable. 
-
-If you want to modify the IP and port, in the details panel you can input both parameters to your liking. The default values are: ``` IP = 127.0.0.1 ``` and ``` Port = 10010```
-
-![Details_Connector](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/52acb043-5e69-4bbb-b164-3f38f6607908)
-
-
+If your environment is a single agent env, place a ```Connector_SA``` instance in your map. Once you do, you can select it and in the details panel you'll find the Default section. There, you'll find an Actor Agent variable, assign your agent to this variable. 
 
 ### MultiAgent Environments
 
-If your environment is a multiagent env, you'll need to place a ```BP_Connector_MA``` instance in your map. Once you do, you can select it and in the details panel you'll find the Default section. There, you'll find an array called Actor Agents. 
+If your environment is a multiagent env, you'll need to place a ```Connector_MA``` instance in your map. Once you do, you can select it and in the details panel you'll find the Default section. There, you'll find an array called Actor Agents. 
 
 ![ConnectorMA_Panel](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/5989c256-024c-4386-b8c5-a585d493488f)
 
 To ensure the framework can recognise all the agents in your environment, add each agent to the array. 
 
-If you want to modify the IP and port, in the details panel you can input both parameters to your liking. The default values are: ``` IP = 127.0.0.1 ``` and ``` Port = 10011```
+Remember that for each agent in your env, you'll have to implement the Reward, Done, Reset, Get State and Step functions.
 
-![Details_Connector_MA](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/0c17fb39-52d6-435e-8ff4-488a76d59db9)
+## Parallel Trainning
+
+If you want to train several envs at the same time, we recommend you create your env as a Blueprint. 
+
+In the Blueprints folder you'll find a ```MultiAgent_Env``` Blueprint.
+
+![Env](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/36be5b8e-78bb-4144-8882-b9e6b8d154e1)
+
+You can create your env with this Blueprint as a parent Class.
+
+In the Viewport of your env blueprint class, drag the connector you need from the Content Drawer and place it where you want. 
+
+In the Event Graph of your env blueprint class, you'll have to do a few things to configure your env. 
+
+First, each env you create will have an ID (which defaults to 1). You can either set this parameter in the Details pannel of your map or create a function to set it automatically.
+
+Then, you need to add the agents in your env to an ```Agents``` array, which belongs to the ```MultiAgent_Env``` class. To do so, simply search for the ```Get Agents``` function and add each of your agents to this array. For example, in the MultiAgent Arena map it looks like this:
+
+![AddAgents](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/7f6670bc-7bc0-4163-b854-652bcefdb9b3)
+
+Finally, you'll have to add the following functions to your env class:
+
+![MultiAgentEnv](https://github.com/Nullspace-Colombia/Multiagents/assets/55969494/ba178e2f-6dc9-4fd0-9d7a-61f71d9e06ef)
+
+This is to set the agents and set the ports in which the communication is going to happen.
+
+
+
+
 
 
 
