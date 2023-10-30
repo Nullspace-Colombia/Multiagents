@@ -2,13 +2,13 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "unray",
+	"FriendlyName": "Unray",
 	"Description": "MARL Tool for UE",
 	"Category": "Other",
-	"CreatedBy": "Nullspace",
+	"CreatedBy": "Unray",
 	"CreatedByURL": "",
 	"DocsURL": "",
-	"MarketplaceURL": "",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/b756d79039204b4f9bceb22abf8c7ee0",
 	"SupportURL": "",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
@@ -19,7 +19,7 @@
 			"Name": "unray",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
+			"PlatformAllowList": [
 				"Win64"
 			]
 		}
