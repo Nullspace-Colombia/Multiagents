@@ -157,13 +157,11 @@ TArray<float> AInferencer::getActions(TArray<float> OutputD) {
 		for (int i = 0; i < nums.Num(); i++) {
 			for (int j = 0; j < nums[i]; j++) {
 				value = values[j + count];
-
 				if (value > max) {
 					max = value;
 					action_value = j;
 				}
 			}
-
 			Actions.Add(action_value);
 			count = count + nums[i];
 			max = 0;
